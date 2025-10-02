@@ -25,4 +25,15 @@ func Register(ctx *gin.Context) {
 
 	// Save user to database (pseudo code, replace with actual DB logic)
 	user.Password = hashedPwd
+
+	token, err := utils.GenerateJWT(user.Username)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }
