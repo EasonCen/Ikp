@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Ikp_gin/global"
 	"Ikp_gin/models"
 	"Ikp_gin/utils"
 	"net/http"
@@ -30,6 +31,18 @@ func Register(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	// Auto migrate the User model
+	if err := global.Db.AutoMigrate(&user); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to migrate user model"})
+		return
+	}
+
+	// Create the user in the database
+	if err := global.Db.Create(&user).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
 
